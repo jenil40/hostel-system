@@ -1,196 +1,164 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { toast, ToastContainer } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
-import "bootstrap-icons/font/bootstrap-icons.css"; // Import Bootstrap Icons
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ChangePassword = () => {
-    const [currentPassword, setCurrentPassword] = useState("");
-    const [newPassword, setNewPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [errors, setErrors] = useState({});
-    const [loading, setLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState({
-        current: false,
-        new: false,
-        confirm: false,
-    }); //  Toggle password visibility
     const navigate = useNavigate();
+    const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState({});
+    const [showPassword, setShowPassword] = useState({
+        currentPassword: false,
+        newPassword: false,
+        confirmNewPassword: false,
+    });
 
-    const validateInputs = () => {
-        let tempErrors = {};
-        let isValid = true;
+    const [passwords, setPasswords] = useState({
+        email: "",
+        currentPassword: "",
+        newPassword: "",
+        confirmNewPassword: "",
+    });
 
-        if (!currentPassword.trim()) {
-            tempErrors.currentPassword = "Current password is required!";
-            isValid = false;
-        }
-
-        if (!newPassword.trim()) {
-            tempErrors.newPassword = "New password is required!";
-            isValid = false;
-        } else if (newPassword.length < 6) {
-            tempErrors.newPassword = "Password must be at least 6 characters long!";
-            isValid = false;
-        } else if (!/[A-Z]/.test(newPassword) || !/[0-9]/.test(newPassword)) {
-            tempErrors.newPassword = "Password must contain an uppercase letter and a number!";
-            isValid = false;
-        }
-
-        if (!confirmPassword.trim()) {
-            tempErrors.confirmPassword = "Confirm password is required!";
-            isValid = false;
-        } else if (newPassword !== confirmPassword) {
-            tempErrors.confirmPassword = "Passwords do not match!";
-            isValid = false;
-        }
-
-        setErrors(tempErrors);
-        return isValid;
+    //  Handle Input Change
+    const handleChange = (e) => {
+        setPasswords({ ...passwords, [e.target.name]: e.target.value });
     };
 
-    const handleChangePassword = async (e) => {
+    //  Toggle Password Visibility
+    const togglePassword = (field) => {
+        setShowPassword((prev) => ({ ...prev, [field]: !prev[field] }));
+    };
+
+    //  Validation Function
+    const validate = () => {
+        let newErrors = {};
+
+        if (!passwords.email.trim()) newErrors.email = "Email is required";
+        if (!passwords.currentPassword.trim()) newErrors.currentPassword = "Current password is required";
+        if (!passwords.newPassword.trim() || passwords.newPassword.length < 6)
+            newErrors.newPassword = "New password must be at least 6 characters";
+        if (passwords.newPassword !== passwords.confirmNewPassword)
+            newErrors.confirmNewPassword = "Passwords do not match";
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+   
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!validateInputs()) {
-            toast.error("Please fix the errors before proceeding!", { autoClose: 2000 });
+        if (!validate()) {
+            toast.error("Please correct the errors before submitting!", { position: "bottom-center", theme: "dark" });
             return;
         }
 
         setLoading(true);
-        const email = localStorage.getItem("email");
-        const userType = "admin";
-
-        // if (!email || !userType) {
-        //     toast.error("User not logged in", { autoClose: 2000 });
-        //     navigate("/admin-login");
-        //     return;
-        // }
 
         try {
-            await axios.post("http://localhost:5000/api/admin/change-password", {
-                userType,
-                email,
-                currentPassword,
-                newPassword,
-            });
+            const response = await axios.post("http://localhost:5000/api/student/change-password", passwords);
 
-            toast.success("Password changed successfully! Logging out...", { autoClose: 2000 });
-
-            // Clear localStorage (forcing logout)
-            setTimeout(() => {
-                localStorage.removeItem("token");
-                localStorage.removeItem("userType");
-                localStorage.removeItem("email");
-                navigate("/admin-login");
-            }, 2500);
+            if (response.status === 200) {
+                toast.success("Password changed successfully!", { position: "bottom-center", theme: "dark", autoClose: 2000 });
+                setTimeout(() => navigate("/student-login"), 2000);
+            } else {
+                toast.error("Failed to change password. Try again!", { position: "bottom-center", theme: "dark" });
+            }
         } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to change password", { autoClose: 2000 });
+            toast.error(error.response?.data?.message || "Error changing password!", { position: "bottom-center", theme: "dark" });
+            console.error("Error:", error);
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="container" style={{ paddingTop: "10%" }}>
-            <ToastContainer position="bottom-center" />
-            <div className="row justify-content-center">
-                <div className="col-md-6">
-                    <div className="card">
-                        <div className="card-body">
-                            <h3 className="text-center">Change Password</h3>
-                            <form onSubmit={handleChangePassword}>
-                                {/* Current Password */}
-                                <div className="mb-3 position-relative">
-                                    <label>Current Password</label>
-                                    <div className="input-group">
-                                        <input
-                                            type={showPassword.current ? "text" : "password"}
-                                            className="form-control"
-                                            placeholder="Enter current password"
-                                            value={currentPassword}
-                                            onChange={(e) => setCurrentPassword(e.target.value)}
-                                        />
-                                        <button
-                                            type="button"
-                                            className="btn btn-outline-secondary"
-                                            onClick={() =>
-                                                setShowPassword((prev) => ({ ...prev, current: !prev.current }))
-                                            }
-                                        >
-                                            <i className={`bi ${showPassword.current ? "bi-eye-slash" : "bi-eye"}`}></i>
-                                        </button>
+        <main className="content">
+            <div className="container mt-5 mb-5">
+                <div className="row">
+                    <div className="col-12 text-center">
+                        <div className="card p-5 shadow">
+                            <h1 className="header-title mb-4">Change Password</h1>
+                            <form onSubmit={handleSubmit} className="php-email-form">
+                                <div className="row gy-4 text-start">
+                                    {/* Email */}
+                                    <div className="col-md-6">
+                                        <input type="email" name="email" className="form-control" placeholder="Your Email" onChange={handleChange} />
+                                        {errors.email && <small className="text-danger">{errors.email}</small>}
                                     </div>
-                                    {errors.currentPassword && (
-                                        <small className="text-danger">{errors.currentPassword}</small>
-                                    )}
-                                </div>
 
-                                {/* New Password */}
-                                <div className="mb-3 position-relative">
-                                    <label>New Password</label>
-                                    <div className="input-group">
+                                    {/* Current Password */}
+                                    <div className="col-md-6 position-relative">
                                         <input
-                                            type={showPassword.new ? "text" : "password"}
+                                            type={showPassword.currentPassword ? "text" : "password"}
+                                            name="currentPassword"
                                             className="form-control"
-                                            placeholder="Enter new password"
-                                            value={newPassword}
-                                            onChange={(e) => setNewPassword(e.target.value)}
+                                            placeholder="Current Password"
+                                            onChange={handleChange}
                                         />
-                                        <button
-                                            type="button"
-                                            className="btn btn-outline-secondary"
-                                            onClick={() =>
-                                                setShowPassword((prev) => ({ ...prev, new: !prev.new }))
-                                            }
+                                        <span
+                                            className="position-absolute top-50 end-0 translate-middle-y me-4 cursor-pointer"
+                                            style={{ cursor: "pointer" }}
+                                            onClick={() => togglePassword("currentPassword")}
                                         >
-                                            <i className={`bi ${showPassword.new ? "bi-eye-slash" : "bi-eye"}`}></i>
-                                        </button>
+                                            {showPassword.currentPassword ? "🔒" : "👁️"}
+                                        </span>
+                                        {errors.currentPassword && <small className="text-danger">{errors.currentPassword}</small>}
                                     </div>
-                                    {errors.newPassword && (
-                                        <small className="text-danger">{errors.newPassword}</small>
-                                    )}
-                                    <small className="text-muted">
-                                        Password must be at least 6 characters, contain an uppercase letter and a number.
-                                    </small>
-                                </div>
 
-                                {/* Confirm New Password */}
-                                <div className="mb-3 position-relative">
-                                    <label>Confirm New Password</label>
-                                    <div className="input-group">
+                                    {/* New Password */}
+                                    <div className="col-md-6 position-relative">
                                         <input
-                                            type={showPassword.confirm ? "text" : "password"}
+                                            type={showPassword.newPassword ? "text" : "password"}
+                                            name="newPassword"
                                             className="form-control"
-                                            placeholder="Confirm new password"
-                                            value={confirmPassword}
-                                            onChange={(e) => setConfirmPassword(e.target.value)}
+                                            placeholder="New Password"
+                                            onChange={handleChange}
                                         />
-                                        <button
-                                            type="button"
-                                            className="btn btn-outline-secondary"
-                                            onClick={() =>
-                                                setShowPassword((prev) => ({ ...prev, confirm: !prev.confirm }))
-                                            }
+                                        <span
+                                            className="position-absolute top-50 end-0 translate-middle-y me-4 cursor-pointer"
+                                            style={{ cursor: "pointer" }}
+                                            onClick={() => togglePassword("newPassword")}
                                         >
-                                            <i className={`bi ${showPassword.confirm ? "bi-eye-slash" : "bi-eye"}`}></i>
-                                        </button>
+                                            {showPassword.newPassword ? "🔒" : "👁️"}
+                                        </span>
+                                        {errors.newPassword && <small className="text-danger">{errors.newPassword}</small>}
                                     </div>
-                                    {errors.confirmPassword && (
-                                        <small className="text-danger">{errors.confirmPassword}</small>
-                                    )}
-                                </div>
 
-                                {/* Submit Button */}
-                                <button type="submit" className="btn btn-primary w-100" disabled={loading}>
-                                    {loading ? "Updating..." : "Change Password"}
-                                </button>
+                                    {/* Confirm New Password */}
+                                    <div className="col-md-6 position-relative">
+                                        <input
+                                            type={showPassword.confirmNewPassword ? "text" : "password"}
+                                            name="confirmNewPassword"
+                                            className="form-control"
+                                            placeholder="Confirm New Password"
+                                            onChange={handleChange}
+                                        />
+                                        <span
+                                            className="position-absolute top-50 end-0 translate-middle-y me-4 cursor-pointer"
+                                            style={{ cursor: "pointer" }}
+                                            onClick={() => togglePassword("confirmNewPassword")}
+                                        >
+                                            {showPassword.confirmNewPassword ? "🔒" : "👁️"}
+                                        </span>
+                                        {errors.confirmNewPassword && <small className="text-danger">{errors.confirmNewPassword}</small>}
+                                    </div>
+
+                                    {/* Submit & Reset Buttons */}
+                                    <div className="col-md-12 text-end">
+                                        {loading && <div className="loading">Loading...</div>}
+                                        <button type="submit" className="btn btn-primary me-3">Change Password</button>
+                                        <button type="reset" className="btn btn-danger">Clear</button>
+                                    </div>
+                                </div>
                             </form>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
+            <ToastContainer autoClose={3000} />
+        </main>
     );
 };
 

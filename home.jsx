@@ -1,143 +1,389 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import { FaBed, FaUsers, FaCogs, FaMoneyBill, FaTools, FaClipboardList } from "react-icons/fa";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import "./Dashboard.css"; // Import the custom CSS file
+import React from "react";
+import { Container, Row, Col, Button, Card } from "react-bootstrap";
 
-const Dashboard = () => {
-    const [data, setData] = useState(null);
-    const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-
-    useEffect(() => {
-        const fetchDashboardData = async () => {
-            try {
-                const response = await axios.get("http://localhost:5000/api/dashboard/summary");
-                setData(response.data);
-                setLoading(false);
-            } catch (err) {
-                setError("Failed to load dashboard data");
-                setLoading(false);
-                toast.error("Error fetching dashboard data!", { position: "bottom-center", theme: "dark" });
-            }
-        };
-        fetchDashboardData();
-    }, []);
-
-    if (loading) return <div className="loading-spinner"><div className="spinner"></div><p>Loading dashboard...</p></div>;
-    if (error) return <p className="error-message">{error}</p>;
-
+const LandingPage = () => {
     return (
-        <main className="dashboard-content" style={{ position : "relative"  , zIndex : "9999999999999999" , marginTop : "10.5px"}}>
-            <div className="container-fluid">
-                <h1 className="dashboard-title">Hostel Management Dashboard</h1>
-
-                <div className="stats-grid">
-                    {/* Room Summary */}
-                    <div className="stat-card rooms-card">
-                        <div className="icon-container">
-                            <FaBed size={30} />
-                        </div>
-                        <div className="stat-content">
-                            <h5>Total Rooms</h5>
-                            <h3>{data.total_rooms}</h3>
-                        </div>
-                    </div>
-
-                    <div className="stat-card available-card">
-                        <div className="icon-container">
-                            <FaBed size={30} />
-                        </div>
-                        <div className="stat-content">
-                            <h5>Available Rooms</h5>
-                            <h3>{data.available_rooms}</h3>
-                        </div>
-                    </div>
-
-                    <div className="stat-card occupied-card">
-                        <div className="icon-container">
-                            <FaBed size={30} />
-                        </div>
-                        <div className="stat-content">
-                            <h5>Occupied Rooms</h5>
-                            <h3>{data.occupied_rooms}</h3>
-                        </div>
-                    </div>
-
-                    {/* Students & Assets */}
-                    <div className="stat-card students-card">
-                        <div className="icon-container">
-                            <FaUsers size={30} />
-                        </div>
-                        <div className="stat-content">
-                            <h5>Total Students</h5>
-                            <h3>{data.total_students}</h3>
-                        </div>
-                    </div>
-
-                    <div className="stat-card assets-card">
-                        <div className="icon-container">
-                            <FaCogs size={30} />
-                        </div>
-                        <div className="stat-content">
-                            <h5>Total Assets</h5>
-                            <h3>{data.total_assets}</h3>
-                        </div>
-                    </div>
-
-                    {/* Fees Collected */}
-                    <div className="stat-card fees-card">
-                        <div className="icon-container">
-                            <FaMoneyBill size={30} />
-                        </div>
-                        <div className="stat-content">
-                            <h5>Total Fees Collected</h5>
-                            <h3>₹{data.total_fees}</h3>
-                        </div>
-                    </div>
-
-                    {/* Maintenance & Leaves */}
-                    <div className="stat-card maintenance-card">
-                        <div className="icon-container">
-                            <FaTools size={30} />
-                        </div>
-                        <div className="stat-content">
-                            <h5>Rooms Needing Maintenance</h5>
-                            <h3>{data.maintenance_needed}</h3>
-                        </div>
-                    </div>
-
-                    <div className="stat-card leaves-card">
-                        <div className="icon-container">
-                            <FaClipboardList size={30} />
-                        </div>
-                        <div className="stat-content">
-                            <h5>Pending Leave Requests</h5>
-                            <h3>{data.pending_leaves}</h3>
-                        </div>
-                    </div>
-                </div>
-
-                {/* Recent Students */}
-                <div className="recent-students-card">
-                    <h5>Recent Students</h5>
-                    <ul className="student-list">
-                        {data.recent_students.map((student, index) => (
-                            <li key={index} className="student-item">
-                                <div className="student-avatar">{student.name.charAt(0)}</div>
-                                <div className="student-info">
-                                    <span className="student-name">{student.name}</span>
-                                    <span className="student-contact">{student.contact_number}</span>
-                                </div>
-                            </li>
-                        ))}
-                    </ul>
-                </div>
+        <div className="landing-page">
+            {/* Hero Section */}
+            <div className="hero text-center text-white d-flex align-items-center">
+                 <Container>
+                    <h1 className="display-4 fw-bold">Welcome to Hostel Management System</h1>
+                    <p className="lead">Efficiently manage rooms, students, fees, and assets with ease.</p>
+                </Container>
             </div>
-            <ToastContainer autoClose={3000} />
-        </main>
+            <section id="stats" className="stats section">
+                <div className="container">
+                    <div className="row gy-4">
+                        <div className="col-lg-3 col-md-6 d-flex flex-column align-items-center">
+                            <i className="bi bi-emoji-smile" />
+                            <div className="stats-item">
+                                <span
+                                    data-purecounter-start={0}
+                                    data-purecounter-end={500}
+                                    data-purecounter-duration={1}
+                                    className="purecounter"
+                                />
+                                <p>Happy Students</p>
+                            </div>
+                        </div>
+                        {/* End Stats Item */}
+                        <div className="col-lg-3 col-md-6 d-flex flex-column align-items-center">
+                            <i className="bi bi-building" />
+                            <div className="stats-item">
+                                <span
+                                    data-purecounter-start={0}
+                                    data-purecounter-end={10}
+                                    data-purecounter-duration={1}
+                                    className="purecounter"
+                                />
+                                <p>Hostels Managed</p>
+                            </div>
+                        </div>
+                        {/* End Stats Item */}
+                        <div className="col-lg-3 col-md-6 d-flex flex-column align-items-center">
+                            <i className="bi bi-headset" />
+                            <div className="stats-item">
+                                <span
+                                    data-purecounter-start={0}
+                                    data-purecounter-end={24}
+                                    data-purecounter-duration={1}
+                                    className="purecounter"
+                                />
+                                <p>Support Hours</p>
+                            </div>
+                        </div>
+                        {/* End Stats Item */}
+                        <div className="col-lg-3 col-md-6 d-flex flex-column align-items-center">
+                            <i className="bi bi-people" />
+                            <div className="stats-item">
+                                <span
+                                    data-purecounter-start={0}
+                                    data-purecounter-end={50}
+                                    data-purecounter-duration={1}
+                                    className="purecounter"
+                                />
+                                <p>Dedicated Staff</p>
+                            </div>
+                        </div>
+                        {/* End Stats Item */}
+                    </div>
+                </div>
+            </section>
+            {/* Features Section */}
+            <Container className="my-5">
+                <h2 className="text-center mb-4">Key Features</h2>
+                <Row>
+                    {/* Feature Cards */}
+                    <Col md={6} lg={4}>
+                        <Card className="feature-card">
+                            <Card.Body>
+                                <Card.Title>Room Management</Card.Title>
+                                <Card.Text>
+                                    Add, edit, and manage rooms along with their status and maintenance details.
+                                </Card.Text>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+
+                    <Col md={6} lg={4}>
+                        <Card className="feature-card">
+                            <Card.Body>
+                                <Card.Title>Student Management</Card.Title>
+                                <Card.Text>
+                                    Store student details, assign rooms, and track student leave requests.
+                                </Card.Text>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+
+                    <Col md={6} lg={4}>
+                        <Card className="feature-card">
+                            <Card.Body>
+                                <Card.Title>Fees & Payments</Card.Title>
+                                <Card.Text>
+                                    Keep track of student fees, payments, and generate reports seamlessly.
+                                </Card.Text>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+
+                    <Col md={6} lg={4}>
+                        <Card className="feature-card">
+                            <Card.Body>
+                                <Card.Title>Asset Management</Card.Title>
+                                <Card.Text>
+                                    Maintain hostel assets, upload bills as PDFs, and manage expenses.
+                                </Card.Text>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+
+                    <Col md={6} lg={4}>
+                        <Card className="feature-card">
+                            <Card.Body>
+                                <Card.Title>Student Profiles</Card.Title>
+                                <Card.Text>
+                                    View student details, including profile photos and contact information.
+                                </Card.Text>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+
+                    <Col md={6} lg={4}>
+                        <Card className="feature-card">
+                            <Card.Body>
+                                <Card.Title>Hostel Dashboard</Card.Title>
+                                <Card.Text>
+                                    A centralized dashboard to track all hostel activities and data.
+                                </Card.Text>
+                            </Card.Body>
+                        </Card>
+                    </Col>
+                </Row>
+            </Container>
+            <>
+                {/* About Section */}
+                <section id="about" className="about section section-bg dark-background">
+                    <div className="container position-relative">
+                        <div className="row gy-5">
+                            <div className="content col-xl-5 d-flex flex-column">
+                                <h3>Efficient Hostel Management Made Simple</h3>
+                                <p>
+                                    Our hostel management system is designed to streamline operations,
+                                    enhance student experience, and ensure smooth day-to-day management.
+                                    From room allocation to leave management, we've got you covered.
+                                </p>
+                            </div>
+                            <div className="col-xl-7">
+                                <div className="row gy-4">
+                                    <div className="col-md-6 icon-box position-relative">
+                                        <i className="bi bi-door-open" />
+                                        <h4>
+                                            <a href="" className="stretched-link">
+                                                Room Allocation
+                                            </a>
+                                        </h4>
+                                        <p>
+                                            Easily allocate rooms to students based on availability and
+                                            preferences.
+                                        </p>
+                                    </div>
+                                    {/* End Icon-Box */}
+                                    <div className="col-md-6 icon-box position-relative">
+                                        <i className="bi bi-calendar-check" />
+                                        <h4>
+                                            <a href="" className="stretched-link">
+                                                Leave Management
+                                            </a>
+                                        </h4>
+                                        <p>
+                                            Track and approve student leave requests with just a few clicks.
+                                        </p>
+                                    </div>
+                                    {/* End Icon-Box */}
+                                    <div className="col-md-6 icon-box position-relative">
+                                        <i className="bi bi-cash-coin" />
+                                        <h4>
+                                            <a href="" className="stretched-link">
+                                                Fee Management
+                                            </a>
+                                        </h4>
+                                        <p>Manage hostel fees, payments, and dues seamlessly.</p>
+                                    </div>
+                                    {/* End Icon-Box */}
+                                    <div className="col-md-6 icon-box position-relative">
+                                        <i className="bi bi-shield-check" />
+                                        <h4>
+                                            <a href="" className="stretched-link">
+                                                Security &amp; Safety
+                                            </a>
+                                        </h4>
+                                        <p>
+                                            Ensure the safety of students with advanced security features.
+                                        </p>
+                                    </div>
+                                    {/* End Icon-Box */}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                {/* /About Section */}
+                {/* Stats Section */}
+
+                {/* /Stats Section */}
+                {/* Tabs Section */}
+                <section id="tabs" className="tabs section">
+                    <div className="container">
+                        <ul className="nav nav-tabs row d-flex">
+                            <li className="nav-item col-3">
+                                <a
+                                    className="nav-link active show"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#tabs-tab-1"
+                                >
+                                    <i className="bi bi-door-open" />
+                                    <h4 className="d-none d-lg-block">Room Management</h4>
+                                </a>
+                            </li>
+                            <li className="nav-item col-3">
+                                <a
+                                    className="nav-link"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#tabs-tab-2"
+                                >
+                                    <i className="bi bi-calendar-check" />
+                                    <h4 className="d-none d-lg-block">Leave Tracking</h4>
+                                </a>
+                            </li>
+
+                            <li className="nav-item col-3">
+                                <a
+                                    className="nav-link"
+                                    data-bs-toggle="tab"
+                                    data-bs-target="#tabs-tab-4"
+                                >
+                                    <i className="bi bi-shield-check" />
+                                    <h4 className="d-none d-lg-block">Safety Measures</h4>
+                                </a>
+                            </li>
+                        </ul>
+                        {/* End Tab Nav */}
+                        <div className="tab-content">
+                            <div className="tab-pane fade active show" id="tabs-tab-1">
+                                <div className="row">
+                                    <div className="col-lg-6 order-2 order-lg-1 mt-3 mt-lg-0">
+                                        <h3>Efficient Room Allocation</h3>
+                                        <p className="fst-italic">
+                                            Our system ensures that students are allocated rooms based on
+                                            availability, preferences, and special requirements.
+                                        </p>
+                                        <ul>
+                                            <li>
+                                                <i className="bi bi-check2-all" />{" "}
+                                                <span>Automated room allocation process.</span>
+                                            </li>
+                                            <li>
+                                                <i className="bi bi-check2-all" />{" "}
+                                                <span>Real-time availability tracking.</span>
+                                            </li>
+                                            <li>
+                                                <i className="bi bi-check2-all" />{" "}
+                                                <span>Support for special accommodations.</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div className="col-lg-6 order-1 order-lg-2 text-center">
+                                        <img
+                                            src="https://content.jdmagicbox.com/comp/def_content/hostel-for-boy-students/e7551345ac-hostel-for-boy-students-5-5j8em.jpg"
+                                            alt="Hostel Room"
+                                            className="img-fluid"
+                                            style={{ height: "250px", width: "250px" }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            {/* End Tab Content Item */}
+                            <div className="tab-pane fade" id="tabs-tab-2">
+                                <div className="row">
+                                    <div className="col-lg-6 order-2 order-lg-1 mt-3 mt-lg-0">
+                                        <h3>Streamlined Leave Management</h3>
+                                        <p>
+                                            Track and manage student leave requests efficiently. Approve or
+                                            reject requests with ease and maintain a record of all leave
+                                            applications.
+                                        </p>
+                                        <ul>
+                                            <li>
+                                                <i className="bi bi-check2-all" />{" "}
+                                                <span>Easy leave application process.</span>
+                                            </li>
+
+                                            <li>
+                                                <i className="bi bi-check2-all" />{" "}
+                                                <span>Historical leave records.</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div className="col-lg-6 order-1 order-lg-2 text-center">
+                                        <img
+                                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSgwWmBBL0T_jEJmigiReuQmF8wzt5ldfc7cRSnU6uKiLGAg6asHXI5Adtqg71OtfKBfRs&usqp=CAU"
+                                            alt="Leave Management"
+                                            className="img-fluid"
+                                            style={{ height: "250px", width: "250px" }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            {/* End Tab Content Item */}
+
+                            {/* End Tab Content Item */}
+                            <div className="tab-pane fade" id="tabs-tab-4">
+                                <div className="row">
+                                    <div className="col-lg-6 order-2 order-lg-1 mt-3 mt-lg-0">
+                                        <h3>Enhanced Safety Measures</h3>
+                                        <p>
+                                            Ensure the safety and security of students with advanced
+                                            features like CCTV monitoring, emergency alerts, and visitor
+                                            tracking.
+                                        </p>
+                                        <ul>
+                                            <li>
+                                                <i className="bi bi-check2-all" />{" "}
+                                                <span>24/7 CCTV surveillance.</span>
+                                            </li>
+                                            <li>
+                                                <i className="bi bi-check2-all" />{" "}
+                                                <span>Emergency alert system.</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div className="col-lg-6 order-1 order-lg-2 text-center">
+                                        <img
+                                            src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSA620n2mR_jTydoAEMLt-Wmmo80WfTx17iHrszh2do1DqQ25oD4d-UXxtYtVi4uKtkDVA&usqp=CAU"
+                                            alt="Safety Measures"
+                                            className="img-fluid"
+                                            style={{ height: "250px", width: "250px" }}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                            {/* End Tab Content Item */}
+                        </div>
+                    </div>
+                </section>
+                {/* /Tabs Section */}
+            </>
+
+            {/* Styles */}
+            <style>{`
+        .landing-page {
+          font-family: Arial, sans-serif;
+        }
+        .hero {
+          background: url('https://cdn.vectorstock.com/i/1000v/20/17/man-character-arrive-at-hostel-building-with-bag-vector-24502017.jpg') no-repeat center center/cover;
+          height: 60vh;
+        }
+        .hero h1 {
+          text-shadow: 2px 2px 10px rgba(0, 0, 0, 0.5);
+        }
+        .feature-card {
+          text-align: center;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          border: none;
+          margin-bottom: 20px;
+          transition: transform 0.3s;
+        }
+        .feature-card:hover {
+          transform: translateY(-5px);
+        }
+        footer {
+          background: #343a40;
+          margin-top: 20px;
+        }
+      `}</style>
+        </div>
     );
 };
 
-export default Dashboard;
+export default LandingPage;
